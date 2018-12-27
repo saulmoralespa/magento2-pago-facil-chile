@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * @copyright Copyright (c) 2018 Saul Morales Paccheco www.saulmoralespa.com
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Store:etc/config.xsd">
+    <default>
+        <payment>
+            <pagofacilchile>
+                <active>0</active>
+                <title>PST Pago fácil SPA</title>
+                <test>1</test>
+                <order_status>pending_payment</order_status>
+                <model>Saulmoralespa\PagoFacilChile\Model\PagoFacilChile</model>
+                <payment_action>true</payment_action>
+                <allowspecific>0</allowspecific>
+                <group>online</group>
+            </pagofacilchile>
+        </payment>
+    </default>
+</config>

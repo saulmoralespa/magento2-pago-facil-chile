@@ -180,9 +180,9 @@ class Data extends \Magento\Framework\App\Action\Action
     public function getAmount($order)
     {
            $amount = $order->getGrandTotal();
-        $currencyCode = $order->getOrderCurrencyCode();
-        if ($currencyCode === 'USD')
-            return number_format($amount, 2, ".", "");
+        //$currencyCode = $order->getOrderCurrencyCode();
+        //if ($currencyCode === 'USD')
+            //return number_format($amount, 2, ".", "");
         return round($amount);
 
     }

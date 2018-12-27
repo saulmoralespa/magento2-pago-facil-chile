@@ -34,7 +34,7 @@ class PagoFacilChile extends \Magento\Payment\Model\Method\AbstractMethod
 
     protected $_canReviewPayment = true;
 
-    protected $_supportedCurrencyCodes = array('CLP','USD');
+    protected $_supportedCurrencyCodes = array('CLP');
 
     protected $_minAmount = null;
 
@@ -112,8 +112,6 @@ class PagoFacilChile extends \Magento\Payment\Model\Method\AbstractMethod
      */
     public function isAvailable(\Magento\Quote\Api\Data\CartInterface $quote = null)
     {
-
-        //$this->_pstPagoFacilLogger->debug($this->_tpConnector->accountId());
 
         if ($quote && (
                 $quote->getBaseGrandTotal() < $this->_minAmount

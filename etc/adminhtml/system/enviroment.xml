@@ -19,7 +19,7 @@
             <field id="account_id" translate="label" type="text" sortOrder="11" showInDefault="1" showInWebsite="1" showInStore="1">
                 <label>Id Service</label>
                 <comment>
-                    <![CDATA[Id of the <a href="https://dashboard-dev.pagofacil.cl/index.php?r=servicios-tbk" target="_blank">service</a> with which the order is generated]]>
+                    <![CDATA[Id of the <a href="https://dashboard-dev.pagofacil.cl/index.php?r=servicios-tbk" target="_blank">service</a>]]>
                 </comment>
             </field>
         </group>
@@ -34,7 +34,7 @@
             <field id="account_id" translate="label" type="text" sortOrder="11" showInDefault="1" showInWebsite="1" showInStore="1">
                 <label>Id Service</label>
                 <comment>
-                    <![CDATA[Id of the <a href="https://dashboard.pagofacil.cl/index.php?r=servicios-tbk" target="_blank">service</a> with which the order is generated]]>
+                    <![CDATA[Id of the <a href="https://dashboard.pagofacil.cl/index.php?r=servicios-tbk" target="_blank">service</a>]]>
                 </comment>
             </field>
         </group>

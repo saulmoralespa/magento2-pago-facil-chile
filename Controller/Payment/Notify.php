@@ -118,7 +118,6 @@ class Notify extends \Magento\Framework\App\Action\Action
 
         $payment = $order->getPayment();
 
-        $payment->setParentTransactionId($order->getId());
         $statuses = $methodInstance->getOrderStates();
 
 
@@ -161,6 +160,8 @@ class Notify extends \Magento\Framework\App\Action\Action
                 $status = $statuses["rejected"];
                 $state = \Magento\Sales\Model\Order::STATE_CANCELED;
 
+                $order->cancel();
+
                 $message = __('Payment declined');
         }
 
@@ -170,7 +171,7 @@ class Notify extends \Magento\Framework\App\Action\Action
         $transaction = $this->_transactionBuilder->setPayment($payment)
             ->setOrder($order)
             ->setTransactionId($payment->getTransactionId())
-            ->build(Transaction::TYPE_CAPTURE);
+            ->build(Transaction::TYPE_ORDER);
 
         $payment->addTransactionCommentsToOrder($transaction, $message);
 

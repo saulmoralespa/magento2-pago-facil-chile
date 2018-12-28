@@ -104,6 +104,7 @@ class Data extends \Magento\Framework\App\Action\Action
             $order = $this->_getCheckoutSession()->getLastRealOrder();
             $json = $this->generateTransaction($order);
 
+
             if ($json){
                 $url = $json->payUrl;
 
@@ -159,7 +160,7 @@ class Data extends \Magento\Framework\App\Action\Action
             $transaction = array(
                 'x_url_callback' => $this->_url->getUrl('pagofacilchile/payment/notify'),
                 'x_url_cancel' => $this->_url->getUrl('checkout/onepage/failure'),
-                'x_url_complete' => $this->_url->getUrl('checkout/onepage/success'), //pagofacilchile/payment/complete
+                'x_url_complete' => $this->_url->getUrl('pagofacilchile/payment/complete'),
                 'x_customer_email' => $order->getCustomerEmail(),
                 'x_reference' => $reference,
                 'x_account_id' => $this->_tpConnector->accountId(),

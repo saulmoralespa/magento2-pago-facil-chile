@@ -1,12 +1,21 @@
 PST Pago Fácil SpA  Magento 2
 ============================================================
 
-## Installation
+## Description ##
+Means of payment of Chile, supports Webpay of Transbank, Khipu and Multicaja
+
+## Table of Contents
+
+* [Installation](#installation)
+* [Configuration](#configuration)
+
+
+## Installation ##
 
 Use composer package manager
 
 ```bash
-saulmoralespa/magento2-pago-facil-chile
+composer require saulmoralespa/magento2-pago-facil-chile
 ```
 
 Execute the commands
@@ -17,3 +26,8 @@ php bin/magento setup:upgrade
 php bin/magento setup:di:compile
 php bin/magento setup:static-content:deploy
 ```
+
+## Configuration ##
+
+### 1. Enter the configuration menu of the payment method ###
+![Enter the configuration menu of the payment method](https://4.bp.blogspot.com/-vPfP40YDaPE/XCZpZS32NaI/AAAAAAAACnA/DGA4AibYG6ETZxmv5gwm4bq3fXszxE_0ACLcBGAs/s1600/configurationmenuofthepaymentmethod.png)

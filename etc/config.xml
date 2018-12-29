@@ -15,7 +15,7 @@
                 <model>Saulmoralespa\PagoFacilChile\Model\PagoFacilChile</model>
                 <payment_action>true</payment_action>
                 <allowspecific>0</allowspecific>
-                <group>online</group>
+                <group>offline</group>
             </pagofacilchile>
         </payment>
     </default>

@@ -89,8 +89,6 @@ class Complete extends \Magento\Framework\App\Action\Action
         if (empty($params))
             exit;
 
-        $this->_pstPagoFacilLogger->debug(print_r($params, true));
-
 
         $reference = $request->getParam('x_reference');
         $reference = explode('_', $reference);
@@ -103,6 +101,15 @@ class Complete extends \Magento\Framework\App\Action\Action
 
         $method = $order->getPayment()->getMethod();
         $methodInstance = $this->_paymentHelper->getMethodInstance($method);
+        $totalOrder = $methodInstance->getAmount($order);
+        $ct_monto = $request->getParam('x_amount');
+
+
+        if ($ct_monto != $totalOrder){
+            $resultRedirect = $this->resultFactory->create(ResultFactory::TYPE_REDIRECT);
+            $resultRedirect->setPath('checkout/onepage/failure');
+            return $resultRedirect;
+        }
 
 
         $payment = $order->getPayment();

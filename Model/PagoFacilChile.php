@@ -145,4 +145,14 @@ class PagoFacilChile extends \Magento\Payment\Model\Method\AbstractMethod
             'rejected' => $this->_scopeConfig->getValue('payment/pagofacilchile/states/rejected', \Magento\Store\Model\ScopeInterface::SCOPE_STORE)
         );
     }
+
+    public function getAmount($order)
+    {
+        $amount = $order->getGrandTotal();
+        //$currencyCode = $order->getOrderCurrencyCode();
+        //if ($currencyCode === 'USD')
+        //return number_format($amount, 2, ".", "");
+        return round($amount);
+
+    }
 }

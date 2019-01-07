@@ -112,6 +112,11 @@ class Notify extends \Magento\Framework\App\Action\Action
 
         $method = $order->getPayment()->getMethod();
         $methodInstance = $this->_paymentHelper->getMethodInstance($method);
+        $totalOrder = $methodInstance->getAmount($order);
+        $ct_monto = $request->getParam('x_amount');
+
+        if ($ct_monto != $totalOrder)
+            exit;
 
 
         $status = $request->getParam('x_result');

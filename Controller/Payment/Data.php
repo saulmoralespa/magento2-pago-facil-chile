@@ -102,7 +102,10 @@ class Data extends \Magento\Framework\App\Action\Action
 
         try{
             $order = $this->_getCheckoutSession()->getLastRealOrder();
-            $json = $this->generateTransaction($order);
+            $method = $order->getPayment()->getMethod();
+            $methodInstance = $this->_paymentHelper->getMethodInstance($method);
+            $total = $methodInstance->getAmount($order);
+            $json = $this->generateTransaction($order, $total);
 
 
             if ($json){
@@ -121,8 +124,6 @@ class Data extends \Magento\Framework\App\Action\Action
 
                 $payment->addTransactionCommentsToOrder($transaction, __('pending'));
 
-                $method = $order->getPayment()->getMethod();
-                $methodInstance = $this->_paymentHelper->getMethodInstance($method);
 
                 $statuses = $methodInstance->getOrderStates();
                 $status = $statuses["pending"];
@@ -142,7 +143,7 @@ class Data extends \Magento\Framework\App\Action\Action
         ]);
     }
 
-    public function generateTransaction($order)
+    public function generateTransaction($order, $total)
     {
         $billing = $order->getBillingAddress();
         $shipping = $order->getShippingAddress();
@@ -164,7 +165,7 @@ class Data extends \Magento\Framework\App\Action\Action
                 'x_customer_email' => $order->getCustomerEmail(),
                 'x_reference' => $reference,
                 'x_account_id' => $this->_tpConnector->accountId(),
-                'x_amount' => $this->getAmount($order),
+                'x_amount' => $total,
                 'x_currency' => $order->getOrderCurrencyCode(),
                 'x_shop_country' => $country
             );
@@ -176,15 +177,5 @@ class Data extends \Magento\Framework\App\Action\Action
         }
 
         return $data;
-    }
-
-    public function getAmount($order)
-    {
-           $amount = $order->getGrandTotal();
-        //$currencyCode = $order->getOrderCurrencyCode();
-        //if ($currencyCode === 'USD')
-            //return number_format($amount, 2, ".", "");
-        return round($amount);
-
     }
 }

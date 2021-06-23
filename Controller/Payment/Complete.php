@@ -10,6 +10,7 @@ namespace Saulmoralespa\PagoFacilChile\Controller\Payment;
 
 use Magento\Framework\Controller\ResultFactory;
 use Magento\Payment\Helper\Data as PaymentHelper;
+use Magento\Sales\Model\Order;
 use Magento\Sales\Model\Order\Payment\Transaction;
 
 class Complete extends \Magento\Framework\App\Action\Action
@@ -55,16 +56,34 @@ class Complete extends \Magento\Framework\App\Action\Action
      */
     protected $_tpConnector;
 
+    /**
+     * @var \Magento\Sales\Model\OrderRepository
+     */
+    protected $_orderRepository;
+
+    /**
+     * @var \Magento\Framework\App\Request\Http
+     */
+    protected $request;
+
+    /**
+     * @var \Magento\Framework\Data\Form\FormKey
+     */
+    protected $formKey;
+
     public function __construct(
         \Saulmoralespa\PagoFacilChile\Logger\Logger $pstPagoFacilLogger,
         \Saulmoralespa\PagoFacilChile\Model\Factory\Connector $tpc,
         \Magento\Framework\App\Action\Context $context,
+        \Magento\Framework\App\Request\Http $request,
+        \Magento\Framework\Data\Form\FormKey $formKey,
         \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
         \Magento\Checkout\Model\Session $checkoutSession,
         \Psr\Log\LoggerInterface $logger,
         PaymentHelper $paymentHelper,
         \Magento\Sales\Api\TransactionRepositoryInterface $transactionRepository,
-        \Magento\Sales\Model\Order\Payment\Transaction\BuilderInterface $transactionBuilder
+        \Magento\Sales\Model\Order\Payment\Transaction\BuilderInterface $transactionBuilder,
+        \Magento\Sales\Model\OrderRepository $orderRepository
     )
     {
         parent::__construct($context);
@@ -77,6 +96,10 @@ class Complete extends \Magento\Framework\App\Action\Action
         $this->_transactionBuilder = $transactionBuilder;
         $this->_pstPagoFacilLogger = $pstPagoFacilLogger;
         $this->_tpConnector = $tpc;
+        $this->_orderRepository = $orderRepository;
+        $this->request = $request;
+        $this->formKey = $formKey;
+        $this->request->setParam('form_key', $this->formKey->getFormKey());
     }
 
     public function execute()
@@ -89,15 +112,12 @@ class Complete extends \Magento\Framework\App\Action\Action
         if (empty($params))
             exit;
 
-
         $reference = $request->getParam('x_reference');
         $reference = explode('_', $reference);
         $order_id = $reference[0];
 
-        $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
-        $order_model = $objectManager->get('Magento\Sales\Model\Order');
-        $order = $order_model->load($order_id);
-
+        /** @var Order $order */
+        $order = $this->_orderRepository->get($order_id);
 
         $method = $order->getPayment()->getMethod();
         $methodInstance = $this->_paymentHelper->getMethodInstance($method);
@@ -126,8 +146,7 @@ class Complete extends \Magento\Framework\App\Action\Action
 
         $transaction = $this->_transactionRepository->getByTransactionType(
             Transaction::TYPE_ORDER,
-            $payment->getId(),
-            $payment->getOrder()->getId()
+            $payment->getId()
         );
 
 
@@ -164,26 +183,6 @@ class Complete extends \Magento\Framework\App\Action\Action
 
             $order->setState($state)->setStatus($status);
             $payment->setSkipOrderProcessing(true);
-
-            $invoice = $objectManager->create('Magento\Sales\Model\Service\InvoiceService')->prepareInvoice($order);
-            $invoice = $invoice->setTransactionId($payment->getTransactionId())
-                ->addComment("Invoice created.")
-                ->setRequestedCaptureCase(\Magento\Sales\Model\Order\Invoice::CAPTURE_ONLINE);
-            $invoice->register()
-                ->pay();
-            $invoice->save();
-
-            // Save the invoice to the order
-            $transactionInvoice = $this->_objectManager->create('Magento\Framework\DB\Transaction')
-                ->addObject($invoice)
-                ->addObject($invoice->getOrder());
-
-            $transactionInvoice->save();
-
-            $order->addStatusHistoryComment(
-                __('Invoice #%1.', $invoice->getId())
-            )
-                ->setIsCustomerNotified(true);
 
             $message = __('Payment approved');
 

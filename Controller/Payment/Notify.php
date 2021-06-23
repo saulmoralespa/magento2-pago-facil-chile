@@ -70,15 +70,16 @@ class Notify extends \Magento\Framework\App\Action\Action
      * Notify constructor.
      * @param \Saulmoralespa\PagoFacilChile\Logger\Logger $pstPagoFacilLogger
      * @param \Saulmoralespa\PagoFacilChile\Model\Factory\Connector $tpc
-     * @params \Magento\Framework\App\Request\Http $request
-     * @params \Magento\Framework\Data\Form\FormKey $formKey
      * @param \Magento\Framework\App\Action\Context $context
+     * @param \Magento\Framework\App\Request\Http $request
+     * @param \Magento\Framework\Data\Form\FormKey $formKey
      * @param \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
      * @param \Magento\Checkout\Model\Session $checkoutSession
      * @param \Psr\Log\LoggerInterface $logger
      * @param PaymentHelper $paymentHelper
      * @param \Magento\Sales\Api\TransactionRepositoryInterface $transactionRepository
      * @param Transaction\BuilderInterface $transactionBuilder
+     * @throws \Magento\Framework\Exception\LocalizedException
      */
     public function __construct(
         \Saulmoralespa\PagoFacilChile\Logger\Logger $pstPagoFacilLogger,
@@ -135,7 +136,6 @@ class Notify extends \Magento\Framework\App\Action\Action
         if ($ct_monto != $totalOrder)
             exit;
 
-
         $status = $request->getParam('x_result');
 
         $payment = $order->getPayment();
@@ -153,26 +153,6 @@ class Notify extends \Magento\Framework\App\Action\Action
                 $payment->setIsTransactionApproved(true);
                 $status = $statuses["approved"];
                 $state = \Magento\Sales\Model\Order::STATE_PROCESSING;
-
-                $invoice = $objectManager->create('Magento\Sales\Model\Service\InvoiceService')->prepareInvoice($order);
-                $invoice = $invoice->setTransactionId($payment->getTransactionId())
-                    ->addComment("Invoice created.")
-                    ->setRequestedCaptureCase(\Magento\Sales\Model\Order\Invoice::CAPTURE_ONLINE);
-                $invoice->register()
-                    ->pay();
-                $invoice->save();
-
-                // Save the invoice to the order
-                $transactionInvoice = $this->_objectManager->create('Magento\Framework\DB\Transaction')
-                    ->addObject($invoice)
-                    ->addObject($invoice->getOrder());
-
-                $transactionInvoice->save();
-
-                $order->addStatusHistoryComment(
-                    __('Invoice #%1.', $invoice->getId())
-                )
-                    ->setIsCustomerNotified(true);
 
                 $message = __('Payment approved');
 

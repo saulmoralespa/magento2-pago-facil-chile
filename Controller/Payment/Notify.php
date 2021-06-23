@@ -55,11 +55,23 @@ class Notify extends \Magento\Framework\App\Action\Action
      */
     protected $_tpConnector;
 
+    /**
+     * @var \Magento\Framework\App\Request\Http
+     */
+    protected $request;
+
+    /**
+     * @var \Magento\Framework\Data\Form\FormKey
+     */
+    protected $formKey;
+
 
     /**
      * Notify constructor.
      * @param \Saulmoralespa\PagoFacilChile\Logger\Logger $pstPagoFacilLogger
      * @param \Saulmoralespa\PagoFacilChile\Model\Factory\Connector $tpc
+     * @params \Magento\Framework\App\Request\Http $request
+     * @params \Magento\Framework\Data\Form\FormKey $formKey
      * @param \Magento\Framework\App\Action\Context $context
      * @param \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
      * @param \Magento\Checkout\Model\Session $checkoutSession
@@ -72,6 +84,8 @@ class Notify extends \Magento\Framework\App\Action\Action
         \Saulmoralespa\PagoFacilChile\Logger\Logger $pstPagoFacilLogger,
         \Saulmoralespa\PagoFacilChile\Model\Factory\Connector $tpc,
         \Magento\Framework\App\Action\Context $context,
+        \Magento\Framework\App\Request\Http $request,
+        \Magento\Framework\Data\Form\FormKey $formKey,
         \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
         \Magento\Checkout\Model\Session $checkoutSession,
         \Psr\Log\LoggerInterface $logger,
@@ -90,6 +104,9 @@ class Notify extends \Magento\Framework\App\Action\Action
         $this->_transactionBuilder = $transactionBuilder;
         $this->_pstPagoFacilLogger = $pstPagoFacilLogger;
         $this->_tpConnector = $tpc;
+        $this->request = $request;
+        $this->formKey = $formKey;
+        $this->request->setParam('form_key', $this->formKey->getFormKey());
     }
 
     public function execute()

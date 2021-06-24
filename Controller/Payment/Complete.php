@@ -71,6 +71,11 @@ class Complete extends \Magento\Framework\App\Action\Action
      */
     protected $formKey;
 
+    /**
+     * @var \Magento\Sales\Model\Order\Email\Sender\OrderSender
+     */
+    protected $orderSender;
+
     public function __construct(
         \Saulmoralespa\PagoFacilChile\Logger\Logger $pstPagoFacilLogger,
         \Saulmoralespa\PagoFacilChile\Model\Factory\Connector $tpc,
@@ -83,7 +88,8 @@ class Complete extends \Magento\Framework\App\Action\Action
         PaymentHelper $paymentHelper,
         \Magento\Sales\Api\TransactionRepositoryInterface $transactionRepository,
         \Magento\Sales\Model\Order\Payment\Transaction\BuilderInterface $transactionBuilder,
-        \Magento\Sales\Model\OrderRepository $orderRepository
+        \Magento\Sales\Model\OrderRepository $orderRepository,
+        \Magento\Sales\Model\Order\Email\Sender\OrderSender $orderSender
     )
     {
         parent::__construct($context);
@@ -100,6 +106,7 @@ class Complete extends \Magento\Framework\App\Action\Action
         $this->request = $request;
         $this->formKey = $formKey;
         $this->request->setParam('form_key', $this->formKey->getFormKey());
+        $this->orderSender = $orderSender;
     }
 
     public function execute()
@@ -163,6 +170,9 @@ class Complete extends \Magento\Framework\App\Action\Action
             $state = $failedOrder;
 
             $order->setState($state)->setStatus($status);
+            if(!$order->getEmailSent()){
+                $this->orderSender->send($order, true);
+            }
             $payment->setSkipOrderProcessing(true);
 
             $message = __('Payment declined');
@@ -180,8 +190,10 @@ class Complete extends \Magento\Framework\App\Action\Action
             $status = $statuses["approved"];
             $state = $aprovvedOrder;
 
-
             $order->setState($state)->setStatus($status);
+            if(!$order->getEmailSent()){
+                $this->orderSender->send($order, true);
+            }
             $payment->setSkipOrderProcessing(true);
 
             $message = __('Payment approved');

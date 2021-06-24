@@ -65,6 +65,11 @@ class Notify extends \Magento\Framework\App\Action\Action
      */
     protected $formKey;
 
+    /**
+     * @var \Magento\Sales\Model\Order\Email\Sender\OrderSender
+     */
+    protected $orderSender;
+
 
     /**
      * Notify constructor.
@@ -92,7 +97,8 @@ class Notify extends \Magento\Framework\App\Action\Action
         \Psr\Log\LoggerInterface $logger,
         PaymentHelper $paymentHelper,
         \Magento\Sales\Api\TransactionRepositoryInterface $transactionRepository,
-        \Magento\Sales\Model\Order\Payment\Transaction\BuilderInterface $transactionBuilder
+        \Magento\Sales\Model\Order\Payment\Transaction\BuilderInterface $transactionBuilder,
+        \Magento\Sales\Model\Order\Email\Sender\OrderSender $orderSender
     )
     {
         parent::__construct($context);
@@ -108,6 +114,7 @@ class Notify extends \Magento\Framework\App\Action\Action
         $this->request = $request;
         $this->formKey = $formKey;
         $this->request->setParam('form_key', $this->formKey->getFormKey());
+        $this->orderSender = $orderSender;
     }
 
     public function execute()
@@ -168,6 +175,9 @@ class Notify extends \Magento\Framework\App\Action\Action
         }
 
         $order->setState($state)->setStatus($status);
+        if(!$order->getEmailSent()){
+            $this->orderSender->send($order, true);
+        }
         $payment->setSkipOrderProcessing(true);
 
         $transaction = $this->_transactionBuilder->setPayment($payment)

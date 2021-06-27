@@ -132,24 +132,19 @@ class Complete extends \Magento\Framework\App\Action\Action
         $ct_monto = $request->getParam('x_amount');
 
 
-        if ($ct_monto != $totalOrder){
-            $resultRedirect = $this->resultFactory->create(ResultFactory::TYPE_REDIRECT);
-            $resultRedirect->setPath('checkout/onepage/failure');
-            return $resultRedirect;
+        if ($ct_monto != $totalOrder) {
+            $this->_redirect('checkout/onepage/failure');
         }
-
 
         $payment = $order->getPayment();
 
         $statuses = $methodInstance->getOrderStates();
-
 
         $statusTransaction = $request->getParam('x_result');
 
         $pendingOrder = \Magento\Sales\Model\Order::STATE_PENDING_PAYMENT;
         $failedOrder = \Magento\Sales\Model\Order::STATE_CANCELED;
         $aprovvedOrder =  \Magento\Sales\Model\Order::STATE_PROCESSING;
-
 
         $transaction = $this->_transactionRepository->getByTransactionType(
             Transaction::TYPE_ORDER,
@@ -185,6 +180,8 @@ class Complete extends \Magento\Framework\App\Action\Action
             $pathRedirect = "checkout/onepage/failure";
         }elseif ($order->getState() == $pendingOrder && $statusTransaction == 'completed'){
 
+            $this->_pstPagoFacilLogger->debug('Controller complete: status payment completed');
+
             $payment->setIsTransactionPending(false);
             $payment->setIsTransactionApproved(true);
             $status = $statuses["approved"];
@@ -192,6 +189,7 @@ class Complete extends \Magento\Framework\App\Action\Action
 
             $order->setState($state)->setStatus($status);
             if(!$order->getEmailSent()){
+                $this->_pstPagoFacilLogger->debug('Controller complete: send_email');
                 $this->orderSender->send($order, true);
             }
             $payment->setSkipOrderProcessing(true);
@@ -206,9 +204,7 @@ class Complete extends \Magento\Framework\App\Action\Action
 
         }
 
-        $resultRedirect = $this->resultFactory->create(ResultFactory::TYPE_REDIRECT);
-        $resultRedirect->setPath($pathRedirect);
-        return $resultRedirect;
+        $this->_redirect($pathRedirect);
     }
 
 }
